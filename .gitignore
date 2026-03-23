@@ -1,0 +1,29 @@
+# Root dependencies
+node_modules/
+
+# Environment files (all packages)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Generic coverage output
+coverage/
+
+# Optional: temporary/cache
+.tmp/
+temp/
+.cache/
