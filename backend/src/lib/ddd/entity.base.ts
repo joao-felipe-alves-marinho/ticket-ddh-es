@@ -2,7 +2,7 @@ import {
   ArgumentInvalidException,
   ArgumentNotProvidedException,
 } from '../exceptions';
-import { Guard } from '../guards';
+import { Guard } from '../guard';
 import { convertPropsToObject } from '../utils/convert-props-to-object.util';
 
 export type AggregateID = string;

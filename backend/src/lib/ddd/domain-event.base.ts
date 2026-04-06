@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { ArgumentNotProvidedException } from '../exceptions';
-import { Guard } from '../guards';
+import { Guard } from '../guard';
 
 type DomainEventMetadata = {
   readonly occurredAt: Date;

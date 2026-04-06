@@ -3,7 +3,7 @@ export class Guard {
     if (typeof value === 'number' || typeof value === 'boolean') {
       return false;
     }
-    if (value === null || value === 'undefined') {
+    if (value === null || typeof value === 'undefined') {
       return true;
     }
     if (value instanceof Date) {
@@ -21,6 +21,26 @@ export class Guard {
       }
     }
     if (value === '') {
+      return true;
+    }
+    return false;
+  }
+
+  static lengthIsBetween(
+    value: number | string | Array<unknown>,
+    min: number,
+    max: number,
+  ): boolean {
+    if (Guard.isEmpty(value)) {
+      throw new Error('Value must be provided');
+    }
+
+    const valueLength =
+      typeof value === 'number'
+        ? Number(value).toString().length
+        : value.length;
+
+    if (valueLength >= min && valueLength <= max) {
       return true;
     }
     return false;

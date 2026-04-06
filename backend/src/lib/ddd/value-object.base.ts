@@ -1,8 +1,9 @@
 import { ArgumentNotProvidedException } from '../exceptions';
-import { Guard } from '../guards';
+import { Guard } from '../guard';
 import { convertPropsToObject } from '../utils/convert-props-to-object.util';
 
 export type Primitive = string | number | boolean;
+
 export interface DomainPrimitive<T extends Primitive | Date> {
   value: T;
 }
