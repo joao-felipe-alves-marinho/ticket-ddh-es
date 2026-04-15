@@ -9,7 +9,10 @@ type DomainEventMetadata = {
   readonly userId?: string;
 };
 
-export type DomainEventProps<T> = T & {
+export type DomainEventProps<T> = Omit<
+  T,
+  'id' | 'aggregateId' | 'eventName' | 'version' | 'metadata'
+> & {
   aggregateId: string;
   metadata?: DomainEventMetadata;
 };
@@ -20,7 +23,7 @@ type DomainEventClass = {
 };
 
 export abstract class DomainEvent {
-  public static readonly VERSION = 1;
+  public static readonly VERSION: number = 1;
 
   public readonly id: string;
   public readonly aggregateId: string;
