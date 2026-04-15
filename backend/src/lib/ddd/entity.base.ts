@@ -1,9 +1,9 @@
+import { Guard } from '../common/guard';
 import {
   ArgumentInvalidException,
   ArgumentNotProvidedException,
-} from '../exceptions';
-import { Guard } from '../guard';
-import { convertPropsToObject } from '../utils/convert-props-to-object.util';
+} from '../common/exceptions';
+import { convertPropsToObject } from '../common/utils';
 
 export type AggregateID = string;
 

@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
-import { ArgumentNotProvidedException } from '../exceptions';
-import { Guard } from '../guard';
+import { Guard } from '../common/guard';
+import { ArgumentNotProvidedException } from '../common/exceptions';
 
 type DomainEventMetadata = {
   readonly occurredAt: Date;
@@ -9,7 +9,7 @@ type DomainEventMetadata = {
   readonly userId?: string;
 };
 
-export type DomainEventProps<T> = Omit<T, 'id' | 'metadata'> & {
+export type DomainEventProps<T> = T & {
   aggregateId: string;
   metadata?: DomainEventMetadata;
 };

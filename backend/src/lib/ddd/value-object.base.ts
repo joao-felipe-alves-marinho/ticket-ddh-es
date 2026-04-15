@@ -1,6 +1,6 @@
-import { ArgumentNotProvidedException } from '../exceptions';
-import { Guard } from '../guard';
-import { convertPropsToObject } from '../utils/convert-props-to-object.util';
+import { Guard } from '../common/guard';
+import { convertPropsToObject } from '../common/utils';
+import { ArgumentNotProvidedException } from '../common/exceptions';
 
 export type Primitive = string | number | boolean;
 
