@@ -1,6 +1,7 @@
 import {
   ARGUMENT_INVALID,
   ARGUMENT_NOT_PROVIDED,
+  ARGUMENT_OUT_OF_RANGE,
   CONFLICT,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND,
@@ -13,6 +14,10 @@ export class ArgumentInvalidException extends ExceptionBase {
 
 export class ArgumentNotProvidedException extends ExceptionBase {
   readonly code = ARGUMENT_NOT_PROVIDED;
+}
+
+export class ArgumentOutOfRangeException extends ExceptionBase {
+  readonly code = ARGUMENT_OUT_OF_RANGE;
 }
 
 export class ConflictException extends ExceptionBase {
