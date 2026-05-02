@@ -1,6 +1,6 @@
 # Ticket Manager System - Backend
 
-A modern, event-sourced ticket management system built with **NestJS**, **Domain-Driven Design (DDD)**, **Event Sourcing**, and **CQRS** patterns.
+A modern, event-sourced ticket management system built with **NestJS**, **Domain-Driven Hexagon (DDH)**, **Event Sourcing**, and **CQRS** patterns.
 
 ## 🎯 Project Overview
 
