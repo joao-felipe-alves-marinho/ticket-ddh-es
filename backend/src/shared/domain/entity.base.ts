@@ -21,27 +21,12 @@ export interface CreatedEntityProps<T> {
 }
 
 export abstract class Entity<EntityProps> {
-  constructor({
-    id,
-    createdAt,
-    updatedAt,
-    props,
-  }: CreatedEntityProps<EntityProps>) {
-    this._id = id;
-    this.validateProps(props);
-    const now = new Date();
-    this._createdAt = createdAt || now;
-    this._updatedAt = updatedAt || now;
-    this.props = props;
-    this.validate();
-  }
+  protected _id!: AggregateID;
+  protected props!: EntityProps;
 
-  protected readonly props: EntityProps;
-
-  protected readonly _id: AggregateID;
-
-  private readonly _createdAt: Date;
-  private _updatedAt: Date;
+  protected _createdAt!: Date;
+  protected _updatedAt!: Date;
+  protected _revision?: bigint;
 
   get id(): AggregateID {
     return this._id;
@@ -55,9 +40,13 @@ export abstract class Entity<EntityProps> {
     return this._updatedAt;
   }
 
+  get revision(): bigint | undefined {
+    return this._revision;
+  }
+
   public abstract validate(): void;
 
-  private validateProps(props: EntityProps): void {
+  protected validateProps(props: EntityProps): void {
     if (Guard.isEmpty(props)) {
       throw new ArgumentNotProvidedException('Entity props must be provided');
     }
@@ -87,6 +76,10 @@ export abstract class Entity<EntityProps> {
       ...plainProps,
     };
     return Object.freeze(result);
+  }
+
+  public markPersisted(revision: bigint): void {
+    this._revision = revision;
   }
 
   public equals(object?: Entity<EntityProps>): boolean {

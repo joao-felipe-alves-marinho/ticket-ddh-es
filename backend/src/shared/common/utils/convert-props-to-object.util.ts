@@ -1,4 +1,4 @@
-import { ValueObject, Entity } from 'src/lib/ddd';
+import { ValueObject, Entity } from 'src/shared/domain';
 
 function convertToPlainObject(item: unknown): unknown {
   if (ValueObject.isValueObject(item)) {
