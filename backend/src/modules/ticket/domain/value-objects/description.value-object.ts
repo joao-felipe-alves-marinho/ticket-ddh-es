@@ -1,6 +1,6 @@
-import { DomainPrimitive, ValueObject } from 'src/lib/ddd';
-import { Guard } from 'src/lib/common/guard';
-import { ArgumentInvalidException } from 'src/lib/common/exceptions';
+import { DomainPrimitive, ValueObject } from 'src/shared/domain';
+import { Guard } from 'src/shared/common/guard';
+import { ArgumentOutOfRangeException } from 'src/shared/common/exceptions';
 
 export class Description extends ValueObject<string> {
   static create(description: string): Description {
@@ -15,7 +15,7 @@ export class Description extends ValueObject<string> {
     const normalizedDescription = props.value.trim();
 
     if (!Guard.lengthIsBetween(normalizedDescription, 1, 2000)) {
-      throw new ArgumentInvalidException(
+      throw new ArgumentOutOfRangeException(
         `Ticket description must be between 1 and 2000 characters`,
       );
     }

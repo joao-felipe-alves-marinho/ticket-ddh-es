@@ -1,7 +1,7 @@
-import { ArgumentInvalidException } from 'src/lib/common/exceptions';
-import { DomainPrimitive, ValueObject } from 'src/lib/ddd';
+import { ArgumentInvalidException } from 'src/shared/common/exceptions';
+import { DomainPrimitive, ValueObject } from 'src/shared/domain';
 
-const ALLOWED_URGENCIES = ['low', 'medium', 'high'] as const;
+export const ALLOWED_URGENCIES = ['low', 'medium', 'high'] as const;
 
 export type TicketUrgency = (typeof ALLOWED_URGENCIES)[number];
 

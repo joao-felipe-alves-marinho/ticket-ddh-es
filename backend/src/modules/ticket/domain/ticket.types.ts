@@ -1,4 +1,4 @@
-import { AggregateID } from 'src/lib/ddd';
+import { AggregateID } from 'src/shared/domain';
 import {
   Title,
   Description,
@@ -6,24 +6,20 @@ import {
   Urgency,
   Priority,
   BlockReason,
-  TicketUrgency,
 } from './value-objects';
 
 export interface CreateTicketProps {
   reporterId: AggregateID;
-  title: string;
-  description: string;
-  urgency: TicketUrgency;
+  title: Title;
+  description: Description;
+  urgency: Urgency;
 }
 
 export type UpdateTicketDetailsProps = Partial<
   Omit<CreateTicketProps, 'reporterId'>
 >;
 
-export interface TicketProps extends Pick<CreateTicketProps, 'reporterId'> {
-  title: Title;
-  description: Description;
-  urgency: Urgency;
+export interface TicketProps extends CreateTicketProps {
   status: Status;
   priority?: Priority;
   assigneeId?: AggregateID;

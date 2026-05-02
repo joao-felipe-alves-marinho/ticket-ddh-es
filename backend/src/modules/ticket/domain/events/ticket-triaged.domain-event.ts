@@ -1,4 +1,4 @@
-import { DomainEvent, DomainEventProps } from 'src/lib/ddd';
+import { DomainEvent, DomainEventProps } from 'src/shared/domain';
 import { TicketPriority, TicketStatus } from '../value-objects';
 
 export class TicketTriagedDomainEvent extends DomainEvent {

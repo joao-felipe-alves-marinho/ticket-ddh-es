@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
-import { Result } from 'src/lib/common/result';
-import { AggregateID, AggregateRoot } from 'src/lib/ddd';
+import { Result } from 'src/shared/common/result';
+import { AggregateID, AggregateRoot } from 'src/shared/domain';
 import {
   TicketAssigneeNotPresentError,
   TicketInvalidStatusTransitionError,
@@ -13,13 +13,12 @@ import {
   UpdateTicketDetailsProps,
 } from './ticket.types';
 import {
-  Title,
-  Description,
   Status,
-  Urgency,
   Priority,
   BlockReason,
-  TicketPriority,
+  Description,
+  Title,
+  Urgency,
 } from './value-objects';
 import {
   TicketCreatedDomainEvent,
@@ -35,38 +34,29 @@ import {
 import {
   ArgumentNotProvidedException,
   ArgumentInvalidException,
-} from 'src/lib/common/exceptions';
+} from 'src/shared/common/exceptions';
 
 export class Ticket extends AggregateRoot<TicketProps> {
-  static create(create: CreateTicketProps): Ticket {
+  static create(create: CreateTicketProps): Result<Ticket, never> {
     const id = randomUUID();
-    const props: TicketProps = {
-      ...create,
-      title: Title.create(create.title),
-      description: Description.create(create.description),
-      urgency: Urgency.create(create.urgency),
-      status: Status.open(),
-      reopenCount: 0,
-    };
-    const ticket = new Ticket({ id, props });
+    const ticket = new Ticket();
 
-    ticket.addDomainEvent(
+    ticket.apply(
       new TicketCreatedDomainEvent({
-        aggregateId: ticket.id,
-        reporterId: ticket.props.reporterId,
-        title: ticket.props.title.value,
-        description: ticket.props.description.value,
-        urgency: ticket.props.urgency.value,
-        status: ticket.props.status.value,
+        aggregateId: id,
+        reporterId: create.reporterId,
+        title: create.title.value,
+        description: create.description.value,
+        urgency: create.urgency.value,
+        status: Status.open().value,
+        createdAt: new Date().toISOString(),
       }),
     );
 
-    return ticket;
+    return Result.success(ticket);
   }
 
-  triage(
-    priority: TicketPriority,
-  ): Result<void, TicketInvalidStatusTransitionError> {
+  triage(priority: Priority): Result<void, TicketInvalidStatusTransitionError> {
     const canTransition = this.validateTransition(Status.triaged(), [
       Status.open(),
       Status.reopened(),
@@ -76,14 +66,11 @@ export class Ticket extends AggregateRoot<TicketProps> {
       return Result.failure(canTransition.unwrapError());
     }
 
-    this.props.priority = Priority.create(priority);
-    this.props.status = Status.triaged();
-
-    this.addDomainEvent(
+    this.apply(
       new TicketTriagedDomainEvent({
         aggregateId: this.id,
-        priority: this.props.priority.value,
-        status: this.props.status.value,
+        priority: priority.value,
+        status: Status.triaged().value,
       }),
     );
 
@@ -103,12 +90,10 @@ export class Ticket extends AggregateRoot<TicketProps> {
       return Result.success(undefined);
     }
 
-    this.props.assigneeId = assigneeId;
-
-    this.addDomainEvent(
+    this.apply(
       new TicketAssignedDomainEvent({
         aggregateId: this.id,
-        assigneeId,
+        assigneeId: assigneeId,
       }),
     );
 
@@ -132,20 +117,19 @@ export class Ticket extends AggregateRoot<TicketProps> {
       return Result.failure(new TicketAssigneeNotPresentError());
     }
 
-    this.props.blockReason = undefined;
-    this.props.status = Status.inProgress();
-
-    this.addDomainEvent(
+    this.apply(
       new TicketProgressStartedDomainEvent({
         aggregateId: this.id,
-        status: this.props.status.value,
+        status: Status.inProgress().value,
       }),
     );
 
     return Result.success(undefined);
   }
 
-  block(reason: string): Result<void, TicketInvalidStatusTransitionError> {
+  block(
+    blockReason: BlockReason,
+  ): Result<void, TicketInvalidStatusTransitionError> {
     const canTransition = this.validateTransition(Status.blocked(), [
       Status.inProgress(),
     ]);
@@ -154,14 +138,11 @@ export class Ticket extends AggregateRoot<TicketProps> {
       return Result.failure(canTransition.unwrapError());
     }
 
-    this.props.blockReason = BlockReason.create(reason);
-    this.props.status = Status.blocked();
-
-    this.addDomainEvent(
+    this.apply(
       new TicketBlockedDomainEvent({
         aggregateId: this.id,
-        reason: this.props.blockReason.value,
-        status: this.props.status.value,
+        blockReason: blockReason.value,
+        status: Status.blocked().value,
       }),
     );
 
@@ -179,12 +160,10 @@ export class Ticket extends AggregateRoot<TicketProps> {
       return Result.failure(canTransition.unwrapError());
     }
 
-    this.props.status = Status.cancelled();
-
-    this.addDomainEvent(
+    this.apply(
       new TicketCancelledDomainEvent({
         aggregateId: this.id,
-        status: this.props.status.value,
+        status: Status.cancelled().value,
       }),
     );
 
@@ -200,12 +179,10 @@ export class Ticket extends AggregateRoot<TicketProps> {
       return Result.failure(canTransition.unwrapError());
     }
 
-    this.props.status = Status.done();
-
-    this.addDomainEvent(
+    this.apply(
       new TicketResolvedDomainEvent({
         aggregateId: this.id,
-        status: this.props.status.value,
+        status: Status.done().value,
       }),
     );
 
@@ -228,14 +205,11 @@ export class Ticket extends AggregateRoot<TicketProps> {
       return Result.failure(new TicketReopenLimitExceededError());
     }
 
-    this.props.status = Status.reopened();
-    this.props.reopenCount += 1;
-
-    this.addDomainEvent(
+    this.apply(
       new TicketReopenedDomainEvent({
         aggregateId: this.id,
-        status: this.props.status.value,
-        reopenCount: this.props.reopenCount,
+        status: Status.reopened().value,
+        reopenCount: this.props.reopenCount + 1,
       }),
     );
 
@@ -256,19 +230,16 @@ export class Ticket extends AggregateRoot<TicketProps> {
     const eventPayload: Partial<Record<string, unknown>> = {};
 
     if (newDetails.title) {
-      this.props.title = Title.create(newDetails.title);
-      eventPayload.title = this.props.title.value;
+      eventPayload.title = newDetails.title.value;
     }
     if (newDetails.description) {
-      this.props.description = Description.create(newDetails.description);
-      eventPayload.description = this.props.description.value;
+      eventPayload.description = newDetails.description.value;
     }
     if (newDetails.urgency) {
-      this.props.urgency = Urgency.create(newDetails.urgency);
-      eventPayload.urgency = this.props.urgency.value;
+      eventPayload.urgency = newDetails.urgency.value;
     }
 
-    this.addDomainEvent(
+    this.apply(
       new TicketDetailsUpdatedDomainEvent({
         aggregateId: this.id,
         ...eventPayload,
@@ -280,6 +251,75 @@ export class Ticket extends AggregateRoot<TicketProps> {
 
   private isStatus(status: Status): boolean {
     return this.props.status.equals(status);
+  }
+
+  private onTicketCreated(event: TicketCreatedDomainEvent): void {
+    this._id = event.aggregateId;
+    this._createdAt = new Date(event.createdAt);
+    const props: TicketProps = {
+      reporterId: event.reporterId,
+      title: Title.create(event.title),
+      description: Description.create(event.description),
+      urgency: Urgency.create(event.urgency),
+      status: Status.create(event.status),
+      reopenCount: 0,
+    };
+    this.validateProps(props);
+    this.props = props;
+    this.validate();
+  }
+
+  private onTicketTriaged(event: TicketTriagedDomainEvent): void {
+    this.props.priority = Priority.create(event.priority);
+    this.props.status = Status.create(event.status);
+    this.validate();
+  }
+
+  private onTicketAssigned(event: TicketAssignedDomainEvent): void {
+    this.props.assigneeId = event.assigneeId;
+    this.validate();
+  }
+
+  private onTicketProgressStarted(
+    event: TicketProgressStartedDomainEvent,
+  ): void {
+    this.props.status = Status.create(event.status);
+    this.validate();
+  }
+
+  private onTicketBlocked(event: TicketBlockedDomainEvent): void {
+    this.props.blockReason = BlockReason.create(event.blockReason);
+    this.props.status = Status.create(event.status);
+    this.validate();
+  }
+
+  private onTicketCancelled(event: TicketCancelledDomainEvent): void {
+    this.props.status = Status.create(event.status);
+    this.validate();
+  }
+
+  private onTicketResolved(event: TicketResolvedDomainEvent): void {
+    this.props.status = Status.create(event.status);
+    this.validate();
+  }
+
+  private onTicketReopened(event: TicketReopenedDomainEvent): void {
+    this.props.status = Status.create(event.status);
+    this.props.reopenCount = event.reopenCount;
+    this.validate();
+  }
+
+  private onTicketDetailsUpdated(event: TicketDetailsUpdatedDomainEvent): void {
+    if (event.title) {
+      this.props.title = Title.create(event.title);
+    }
+    if (event.description) {
+      this.props.description = Description.create(event.description);
+    }
+    if (event.urgency) {
+      this.props.urgency = Urgency.create(event.urgency);
+    }
+    this.validate();
   }
 
   private validateTransition(

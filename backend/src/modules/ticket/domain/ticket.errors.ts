@@ -1,4 +1,4 @@
-import { ExceptionBase } from 'src/lib/common/exceptions';
+import { ExceptionBase } from 'src/shared/common/exceptions';
 
 type InvalidTicketStatusTransitionErrorMetadata = {
   fromStatus: string;

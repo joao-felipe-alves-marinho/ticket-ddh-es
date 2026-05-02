@@ -1,7 +1,12 @@
-import { ArgumentInvalidException } from 'src/lib/common/exceptions';
-import { DomainPrimitive, ValueObject } from 'src/lib/ddd';
+import { ArgumentInvalidException } from 'src/shared/common/exceptions';
+import { DomainPrimitive, ValueObject } from 'src/shared/domain';
 
-const ALLOWED_PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
+export const ALLOWED_PRIORITIES = [
+  'low',
+  'medium',
+  'high',
+  'critical',
+] as const;
 
 export type TicketPriority = (typeof ALLOWED_PRIORITIES)[number];
 

@@ -1,13 +1,13 @@
-import { DomainEvent, DomainEventProps } from 'src/lib/ddd';
+import { DomainEvent, DomainEventProps } from 'src/shared/domain';
 import { TicketStatus } from '../value-objects';
 
 export class TicketBlockedDomainEvent extends DomainEvent {
-  readonly reason: string;
+  readonly blockReason: string;
   readonly status: TicketStatus;
 
   constructor(props: DomainEventProps<TicketBlockedDomainEvent>) {
     super(props);
-    this.reason = props.reason;
+    this.blockReason = props.blockReason;
     this.status = props.status;
   }
 }
