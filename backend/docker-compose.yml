@@ -1,0 +1,51 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: 3000
+      KURRENTDB_CONNECTION_STRING: kurrentdb://admin:changeit@kurrentdb:2113?tls=false
+      MONGODB_URI: mongodb://mongo:27017/ticket-ddd-es
+      JWT_SECRET: supersecretkey
+      JWT_EXPIRES_IN: 1D
+    depends_on:
+      mongo:
+        condition: service_healthy
+      kurrentdb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ['CMD-SHELL', 'mongosh --quiet --eval "db.adminCommand(\"ping\").ok" | grep 1']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  kurrentdb:
+    image: kurrentplatform/kurrentdb:latest
+    command: --insecure --run-projections=All --start-standard-projections --enable-atom-pub-over-http
+    ports:
+      - '2113:2113'
+    volumes:
+      - kurrentdb-data:/var/lib/kurrentdb
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -sf http://localhost:2113/health/live || exit 1']
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
+  kurrentdb-data:
