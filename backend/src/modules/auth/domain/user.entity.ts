@@ -25,6 +25,22 @@ export class User extends AggregateRoot<UserProps> {
     return Result.success(user);
   }
 
+  public isReporter(): boolean {
+    return this.props.role.equals(Role.reporter());
+  }
+
+  public isAgent(): boolean {
+    return this.props.role.equals(Role.agent());
+  }
+
+  public isManager(): boolean {
+    return this.props.role.equals(Role.manager());
+  }
+
+  public isActive(): boolean {
+    return true;
+  }
+
   private onUserRegistered(event: UserRegisteredDomainEvent): void {
     this._id = event.aggregateId;
     this._createdAt = event.occurredAt;
