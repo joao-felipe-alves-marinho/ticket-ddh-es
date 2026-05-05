@@ -1,92 +1,69 @@
-# ticket-ddh-es
+## IssueFlow (ticket-ddh-es)
 
-A modern, event-sourced ticket management system demonstrating Domain-Driven Hexagon (DDH), Event Sourcing, and CQRS patterns with NestJS.
+Small demo. Show DDD + Event Sourcing + CQRS with NestJS.
 
-## Overview
+Why
+- Learn patterns: aggregates, events, projections, ports & adapters.
 
-`ticket-ddh-es` is a backend reference implementation showcasing clean architecture principles and advanced patterns for building scalable, maintainable distributed systems. It serves as both a working application and an educational resource for applying DDD and event-driven architecture.
+Quick start
+- Prereqs: Node 18+, npm, Docker optional.
 
-**Key Features:**
-- Event Sourcing with KurrentDB as the event store
-- CQRS pattern with separated read and write models
-- Hexagonal (ports & adapters) architecture
-- Domain-Driven Design with rich domain models
-- JWT-based authentication
-- MongoDB for read-model projections
-- Docker support for local development
+- Backend dev:
 
-## Project Structure
-
-```
-ticket-ddh-es/
-├── backend/                 # NestJS application (main focus)
-│   ├── src/
-│   │   ├── modules/         # Feature modules (auth, ticket, etc.)
-│   │   │   ├── domain/      # Business logic, entities, ports
-│   │   │   ├── application/ # Use cases, command/query handlers
-│   │   │   └── infrastructure/
-│   │   └── shared/          # Common DDD bases, infrastructure utilities
-│   ├── Dockerfile
-│   ├── docker-compose.yml
-│   └── package.json
-└── frontend/                # Work in progress (coming later)
-```
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or pnpm
-- Docker & Docker Compose (optional, recommended for full stack)
-
-### Local Development
-
-1. **Install dependencies:**
 ```bash
 cd backend
 npm install
-```
-
-2. **Start in development mode:**
-```bash
 npm run start:dev
 ```
 
-The backend will be available at `http://localhost:3000`.
-
-### Docker
-
-Run the full stack with Docker Compose:
+- Frontend dev:
 
 ```bash
-docker-compose up --build
+cd frontend
+npm install
+npm run dev
 ```
 
-## Architecture Highlights
+- Full stack with Docker:
 
-### Domain-Driven Design
-- **Aggregates**: `UserEntity`, `TicketEntity` enforce consistency boundaries
-- **Value Objects**: Encapsulate domain concepts like `Email`, `Password`, `Role`
-- **Domain Events**: Immutable records of state changes (`UserRegisteredEvent`, `TicketCreatedEvent`, etc.)
-- **Repositories**: Port-based abstractions for data access
+```bash
+docker compose up --build
+```
 
-### Event Sourcing
-- All state mutations are captured as immutable events in KurrentDB
-- Aggregate roots rebuild state by replaying events from history
-- Event store is the single source of truth for writes
+- Full stack stop/remove:
 
-### CQRS
-- **Write Side**: Commands update the event store via handlers
-- **Read Side**: Async projectors subscribe to event streams and populate MongoDB
-- Optimized independently for write and read workloads
+```bash
+docker compose down
+```
 
-### Hexagonal Architecture
-- **Domain Layer**: Pure TypeScript, framework-agnostic, no I/O
-- **Ports (Interfaces)**: Define boundaries (e.g., `UserWriteRepositoryPort`)
-- **Adapters (Infrastructure)**: KurrentDB, MongoDB, HTTP, JWT implementations
+Ports
+- Backend: `http://localhost:3000`
+- Frontend: `http://localhost:3001`
+- MongoDB: `localhost:27017`
+- KurrentDB: `localhost:2113`
 
-## License
+Config
+- Backend-read/write URLs set via envs.
+- Frontend uses `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:3000/api/v1`).
 
-MIT
+What here
+- `backend/` — NestJS app, domain, application, infra.
+- `frontend/` — Next.js UI (App Router, auth, ticket UI).
+
+Important concepts
+- Event store (KurrentDB) is single source of truth for writes.
+- Read models built by projectors into MongoDB.
+- Optimistic concurrency via expected revision on stream writes.
+
+Where to look
+- Domain foundations: `backend/src/shared/domain`.
+- Ticket domain: `backend/src/modules/ticket`.
+- Auth + HTTP adapters: `backend/src/modules/auth/infrastructure`.
+- Frontend auth helper: `frontend/lib/auth.ts`.
+
+Need help?
+- Want tests, examples, or walkthroughs added here? Tell me.
+
+---
+Concise. Caveman style. Want expand sections or add diagrams?
 
