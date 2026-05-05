@@ -44,6 +44,10 @@ export abstract class Entity<EntityProps> {
     return this._revision;
   }
 
+  get version(): bigint {
+    return this._revision ?? -1n;
+  }
+
   public abstract validate(): void;
 
   protected validateProps(props: EntityProps): void {

@@ -38,9 +38,8 @@ export abstract class AggregateRoot<EntityProps> extends Entity<EntityProps> {
     if (handler) {
       handler.call(this, event);
       this._updatedAt = event.occurredAt;
-      if (event.revision !== undefined) {
-        this._revision = event.revision;
-      }
+      const nextRevision: bigint = event.revision ?? this.version + 1n;
+      this._revision = nextRevision;
     } else {
       throw new Error(
         `No handler found for ${eventName} in ${this.constructor.name}`,
