@@ -1,0 +1,24 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/usr/src/app
+      - frontend-node-modules:/usr/src/app/node_modules
+      - frontend-next:/usr/src/app/.next
+    command: ["yarn", "dev", "--hostname", "0.0.0.0"]
+    restart: unless-stopped
+
+volumes:
+  frontend-node-modules:
+  frontend-next:
